@@ -249,13 +249,8 @@ class GameBoard {
         // note: row and col are passed-by-reference
         //---------------------------------------------------------------------------------
         void getHeroPosition(size_t& row, size_t& col) {
-            
-            //---------------------------------
-            // TODO: write this getter function
-            //---------------------------------
-
-            row = 0;  // modify/remove this line
-            col = 0;  // modify/remove this line
+            row = HeroRow;
+            col = HeroCol;
         }
 
         //---------------------------------------------------------------------------------
@@ -266,11 +261,8 @@ class GameBoard {
 	    //      int HeroCol;
         //---------------------------------------------------------------------------------
         void setHeroPosition(size_t row, size_t col) {
-            
-            //---------------------------------
-            // TODO: write this setter function
-            //---------------------------------
-        
+            HeroRow = row;
+            HeroCol = col;
         }
 
         
@@ -286,9 +278,20 @@ class GameBoard {
         //---------------------------------------------------------------------------------
         void findHero() {
             
-            //----------------------------------
-            // TODO: write this updater function
-            //----------------------------------
+            for (size_t r = 0; r < numRows; r++){
+
+                for (size_t c = 0; c < numCols; c++){
+
+                    if (board(r,c)->isHero()){
+                        HeroRow = r;
+                        HeroCol = c;
+                        return;
+                    }
+                }
+            }
+
+            HeroRow = -1;
+            HeroCol = -1;
         
         }
 
