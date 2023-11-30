@@ -373,22 +373,89 @@ class GameBoard {
             size_t newR, newC;
             board(HeroRow,HeroCol)->setNextMove(HeroNextMove);
             board(HeroRow,HeroCol)->attemptMoveTo(newR,newC,HeroRow,HeroCol);
+
             try {
-                // hero attempts to move out-of-bounds in rows
                 if (newR < 0 || newR >= numRows) { 
                     throw runtime_error("Hero trying to move out-of-bounds with an invalid row");
-                } 
+                }
+
             }
             catch (runtime_error& excpt) {
                 cout << excpt.what() << endl;
                 newR = HeroRow;
-                cout << "Changing row for Hero position to stay in-bounds" << endl;
+                cout << "Changing row for Hero position to stay in-bounds\n";
+            }
+
+            try {
+                if (newC < 0 || newC >= numCols){
+                    throw runtime_error("Hero trying to move out-of-bounds with an invalid col");
+                }
+            }
+            catch (runtime_error& excpt){
+                cout << excpt.what() << endl;
+                newC = HeroCol;
+                cout << "Changing column for Hero position to stay in-bounds\n";
+            }
+
+            try {
+                if (board(newR, newC)->isBarrier()){
+                    throw runtime_error("Hero trying to move into a barrier");
+                }
+            }
+            catch (runtime_error& excpt){
+
+                cout << excpt.what() << endl;
+
+                if (!board(newR, HeroCol)->isBarrier()){
+                    newC = HeroCol;
+                }
+                else{
+                    newR = HeroRow;
+                }
+
+                cout << "Changing Hero position to stay off barrier\n";
+
+            }
+
+            bool heroRemoved = false;
+            try {
+
+                if (board(newR, newC)->isHole()){
+                    throw runtime_error("Uh Oh! Hero has moved into a Baddie or the Abyss...");
+                }
+                else if (board(newR, newC)->isBaddie() && board(newR, newC)->display() == '~'){
+                    throw runtime_error("Uh Oh! Hero has moved into a Baddie or the Abyss...");
+                }
+
+            }   
+            catch (runtime_error& excpt){
+                heroRemoved = true;
+                cout << excpt.what() << endl;
+                cout << "Be more careful next time...\n";
+            }
+
+            try {
+
+                if (board(newR, newC)->isBaddie()){
+                    throw runtime_error("Uh Oh! A Baddie has caught the Hero...");
+                }
+            }
+            catch (runtime_error& excpt){
+                heroRemoved = true;
+                cout << excpt.what() << endl;
+                cout << "Be more careful next time...\n";
+            }
+
+            if (heroRemoved){
+                //remove hero
+                return false;
             }
 
             // etc.
+
+            return true;
         }
 
-    
 };
 
 #endif //_GAMEBOARD_H
