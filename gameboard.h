@@ -25,7 +25,171 @@ class GameBoard {
         int numBats;
         bool wonGame; // false, unless the Hero reached the exit successfully
 
-		
+		void heroCollisionChecking(size_t& newR, size_t& newC, bool& heroRemoved){
+
+            try {
+                if (newR < 0 || newR >= numRows) { 
+                    throw runtime_error("Hero trying to move out-of-bounds with an invalid row");
+                }
+            }
+            catch (runtime_error& excpt) {
+                cout << excpt.what() << endl;
+                newR = HeroRow;
+                cout << "Changing row for Hero position to stay in-bounds\n";
+            }
+
+            try {
+                if (newC < 0 || newC >= numCols){
+                    throw runtime_error("Hero trying to move out-of-bounds with an invalid col");
+                }
+            }
+            catch (runtime_error& excpt){
+                cout << excpt.what() << endl;
+                newC = HeroCol;
+                cout << "Changing column for Hero position to stay in-bounds\n";
+            }
+
+            try {
+                if (board(newR, newC)->isExit()){
+                    throw runtime_error("Hero has reached the exit!");
+                }
+            }
+            catch(runtime_error& excpt){
+                cout << excpt.what() << endl;
+                heroRemoved = true;
+                cout << "Hero has escaped!\n";
+                return;
+            }
+
+            try {
+                if (board(newR, newC)->isHole() || board(newR, newC)->isBaddie()){
+                    throw runtime_error("Uh Oh! Hero has moved into a Baddie or the Abyss...");
+                }
+            }   
+            catch (runtime_error& excpt){
+                heroRemoved = true;
+                cout << excpt.what() << endl;
+                cout << "Be more careful next time...\n";
+                return;
+            }
+
+            try {
+                if (board(newR, newC)->isBarrier()){
+                    throw runtime_error("Hero trying to move into a barrier");
+                }
+            }
+            catch (runtime_error& excpt){
+                cout << excpt.what() << endl;
+
+                newC = HeroCol;
+                if (board(newR, newC)->isBarrier()){
+                    newR = HeroRow;
+                }
+
+                cout << "Changing Hero position to stay off barrier\n";
+            }
+
+            
+        }
+
+        void baddieCollisionChecking(BoardCell* &baddie, size_t& newR, size_t& newC, bool& heroRemoved, bool& baddieRemoved){
+
+            try {
+                if (newR < 0 || newR >= numRows) { 
+                    throw runtime_error("Baddie trying to move out-of-bounds with an invalid row");
+                }
+            }
+            catch (runtime_error& excpt) {
+                cout << excpt.what() << endl;
+                newR = baddie->getRow();
+                cout << "Changing row for Baddie position to stay in-bounds\n";
+            }
+
+            try {
+                if (newC < 0 || newC >= numCols){
+                    throw runtime_error("Baddie trying to move out-of-bounds with an invalid col");
+                }
+            }
+            catch (runtime_error& excpt){
+                cout << excpt.what() << endl;
+                newC = baddie->getCol();
+                cout << "Changing column for Baddie position to stay in-bounds\n";
+            }
+
+            try {
+                if (board(newR, newC)->isHero()){
+                    throw runtime_error("Uh Oh! A Baddie has caught the Hero...");
+                }
+            }
+            catch (runtime_error& excpt){
+                cout << excpt.what() << endl;
+                cout << "Better luck next time\n";
+
+                heroRemoved = true;
+                return;
+            }
+
+            try {
+                if (board(newR, newC)->isHole()){
+                    throw runtime_error("Yipee! A Baddie has moved into the Abyss...");
+                }
+            }
+            catch (runtime_error& excpt){
+                cout << excpt.what() << endl;
+                cout << "One less Baddie on the board!\n";
+
+                baddieRemoved = true;
+                return;
+            }
+
+            try {
+                if (board(newR, newC)->isBaddie()){
+                    throw runtime_error("Baddie is trying to move onto another Baddie");
+                }
+            }
+            catch (runtime_error& excpt) {
+                cout << excpt.what() << endl;
+                cout << "Changing Baddie position to stay off other Baddie\n";
+
+                newR = baddie->getRow();
+                newC = baddie->getCol();
+                return;
+            }
+
+            try {
+                if (board(newR, newC)->isBarrier()){
+                    throw runtime_error("Baddie trying to move into a barrier");
+                }
+            }
+            catch (runtime_error& excpt){
+                cout << excpt.what() << endl;
+
+                newC = baddie->getCol();
+                if (board(newR, newC)->isBarrier()){
+                    newR = baddie->getRow();
+                }
+
+                cout << "Changing Baddie position to stay off barrier\n";
+            }
+
+            try {
+                if (board(newR, newC)->isExit()){
+                    throw runtime_error("Baddie trying to move onto exit");
+                }
+            }
+            catch (runtime_error& excpt){
+                cout << excpt.what() << endl;
+
+                newC = baddie->getCol();
+                if (board(newR, newC)->isBarrier()){
+                    newR = baddie->getRow();
+                }
+
+                cout << "Changing Baddie position to stay off exit\n";
+            }
+
+        }
+
 	public: 
 		/* default constructor */
         GameBoard() {
@@ -362,98 +526,58 @@ class GameBoard {
         // return false if Hero is NOT on board at the end of the round
         //---------------------------------------------------------------------------------
         bool makeMoves(char HeroNextMove) {
-            //-----------------------------------
-            // TODO: write this gameplay function
-            //-----------------------------------
-            //
-            // this function should use try/catch statements for handling collision exceptions;
-            // some sample code is provided to get you started...
 
-            // determine where hero proposes to move to
             size_t newR, newC;
             board(HeroRow,HeroCol)->setNextMove(HeroNextMove);
             board(HeroRow,HeroCol)->attemptMoveTo(newR,newC,HeroRow,HeroCol);
 
-            try {
-                if (newR < 0 || newR >= numRows) { 
-                    throw runtime_error("Hero trying to move out-of-bounds with an invalid row");
-                }
-
-            }
-            catch (runtime_error& excpt) {
-                cout << excpt.what() << endl;
-                newR = HeroRow;
-                cout << "Changing row for Hero position to stay in-bounds\n";
-            }
-
-            try {
-                if (newC < 0 || newC >= numCols){
-                    throw runtime_error("Hero trying to move out-of-bounds with an invalid col");
-                }
-            }
-            catch (runtime_error& excpt){
-                cout << excpt.what() << endl;
-                newC = HeroCol;
-                cout << "Changing column for Hero position to stay in-bounds\n";
-            }
-
-            try {
-                if (board(newR, newC)->isBarrier()){
-                    throw runtime_error("Hero trying to move into a barrier");
-                }
-            }
-            catch (runtime_error& excpt){
-
-                cout << excpt.what() << endl;
-
-                if (!board(newR, HeroCol)->isBarrier()){
-                    newC = HeroCol;
-                }
-                else{
-                    newR = HeroRow;
-                }
-
-                cout << "Changing Hero position to stay off barrier\n";
-
-            }
-
             bool heroRemoved = false;
-            try {
-
-                if (board(newR, newC)->isHole()){
-                    throw runtime_error("Uh Oh! Hero has moved into a Baddie or the Abyss...");
-                }
-                else if (board(newR, newC)->isBaddie() && board(newR, newC)->display() == '~'){
-                    throw runtime_error("Uh Oh! Hero has moved into a Baddie or the Abyss...");
-                }
-
-            }   
-            catch (runtime_error& excpt){
-                heroRemoved = true;
-                cout << excpt.what() << endl;
-                cout << "Be more careful next time...\n";
-            }
-
-            try {
-
-                if (board(newR, newC)->isBaddie()){
-                    throw runtime_error("Uh Oh! A Baddie has caught the Hero...");
-                }
-            }
-            catch (runtime_error& excpt){
-                heroRemoved = true;
-                cout << excpt.what() << endl;
-                cout << "Be more careful next time...\n";
-            }
-
+            heroCollisionChecking(newR, newC, heroRemoved);
+            
+            freeCell(HeroRow, HeroCol);
+            Nothing* nothingCell = new Nothing(HeroRow, HeroCol);
+            setCell(nothingCell, HeroRow, HeroCol);
+            HeroRow = newR, HeroCol = newC;
             if (heroRemoved){
-                //remove hero
                 return false;
             }
 
-            // etc.
+            freeCell(newR, newC);
+            Hero* heroCell = new Hero(newR, newC);
+            heroCell->setMoved(true);
+            setCell(heroCell, newR, newC);
 
-            return true;
+            for (size_t r = 0; r < numRows; r++){
+
+                for (size_t c = 0; c < numCols; c++){
+
+                    bool baddieRemoved = false;
+                    if (board(r,c)->isBaddie() && !board(r,c)->getMoved()){
+                        size_t newBadR, newBadC;
+                        board(r,c)->attemptMoveTo(newBadR, newBadC, HeroRow, HeroCol);
+                        baddieCollisionChecking(board(r,c), newBadR, newBadC, heroRemoved, baddieRemoved);
+
+                        if (newBadR == r && newBadC == c){
+                            continue;
+                        }
+
+                        Nothing* nothingCell = new Nothing(r, c);
+
+                        if (baddieRemoved){
+                            freeCell(r, c);
+                            setCell(nothingCell, r, c);
+                            continue;
+                        }
+
+                        freeCell(newBadR, newBadC);
+                        setCell(board(r, c), newBadR, newBadC);
+                        setCell(nothingCell, r, c);
+                        board(r,c)->setMoved(true);
+                    }
+                }
+            }
+
+            return !heroRemoved;
         }
 
 };
