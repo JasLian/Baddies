@@ -57,6 +57,7 @@ class GameBoard {
             catch(runtime_error& excpt){
                 cout << excpt.what() << endl;
                 heroRemoved = true;
+                wonGame = true;
                 cout << "Hero has escaped!\n";
                 return;
             }
@@ -555,6 +556,11 @@ class GameBoard {
                     if (board(r,c)->isBaddie() && !board(r,c)->getMoved()){
                         size_t newBadR, newBadC;
                         board(r,c)->attemptMoveTo(newBadR, newBadC, HeroRow, HeroCol);
+
+                        if (newBadR == r && newBadC == c){
+                            continue;
+                        }
+                        
                         baddieCollisionChecking(board(r,c), newBadR, newBadC, heroRemoved, baddieRemoved);
 
                         if (newBadR == r && newBadC == c){
@@ -571,13 +577,26 @@ class GameBoard {
 
                         freeCell(newBadR, newBadC);
                         setCell(board(r, c), newBadR, newBadC);
-                        setCell(nothingCell, r, c);
+                        board(r,c)->setRow(newBadR);
+                        board(r,c)->setCol(newBadC);
                         board(r,c)->setMoved(true);
+
+                        setCell(nothingCell, r, c);
+                        
                     }
                 }
             }
 
+            for (size_t r = 0; r < numRows; r++){
+
+                for (size_t c = 0; c < numCols; c++){
+                    board(r,c)->setMoved(false);
+                }
+
+            }
+
             return !heroRemoved;
+
         }
 
 };
