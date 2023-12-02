@@ -96,15 +96,15 @@ class Hero: public BoardCell {
             switch(nextMove){
 
                 case 'q':
-                    newR = hRow + 1;
+                    newR = hRow - 1;
                     newC = hCol - 1;
                     break;
                 case 'w':
-                    newR = hRow + 1;
+                    newR = hRow - 1;
                     newC = hCol;
                     break;
                 case 'e':
-                    newR = hRow + 1;
+                    newR = hRow - 1;
                     newC = hCol + 1;
                     break;
                 case 'a':
@@ -116,15 +116,15 @@ class Hero: public BoardCell {
                     newC = hCol + 1;
                     break;
                 case 'z':
-                    newR = hRow - 1;
+                    newR = hRow + 1;
                     newC = hCol - 1;
                     break;
                 case 'x':
-                    newR = hRow - 1;
+                    newR = hRow + 1;
                     newC = hCol;
                     break;
                 case 'c':
-                    newR = hRow - 1;
+                    newR = hRow + 1;
                     newC = hCol + 1;
                     break;
 
@@ -202,10 +202,10 @@ class Monster: public BoardCell {
             else{
                 
                 if (this->getRow() < hRow){
-                    newR = this->getRow() + power;
+                    newR = this->getRow() - power;
                 }
                 else{
-                    newR = this->getRow() - power; 
+                    newR = this->getRow() + power; 
                 }
             }
 
