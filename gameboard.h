@@ -1,3 +1,6 @@
+/*File contains the GameBoard class that represents the game board.
+getHeroPosition(), setHeroPosition(), findHero(), and makeMoves() function written by Jason Liang*/
+
 #ifndef _GAMEBOARD_H
 #define _GAMEBOARD_H
 
@@ -25,8 +28,12 @@ class GameBoard {
         int numBats;
         bool wonGame; // false, unless the Hero reached the exit successfully
 
+        /*Function detects collisions and out of bounds movements for the Hero
+        Try-catch blocks are used to alter movements to avoid collisions into barriers or out of bounds, OR
+        to detect when the Hero comes into contact with baddies or holes*/
 		void heroCollisionChecking(size_t& newR, size_t& newC, bool& heroRemoved){
 
+            //first out of bounds are checked
             try {
                 if (newR < 0 || newR >= numRows) { 
                     throw runtime_error("Hero trying to move out-of-bounds with an invalid row");
@@ -49,6 +56,7 @@ class GameBoard {
                 cout << "Changing column for Hero position to stay in-bounds\n";
             }
 
+            //checks for exit
             try {
                 if (board(newR, newC)->isExit()){
                     throw runtime_error("Hero has reached the exit!");
@@ -62,6 +70,7 @@ class GameBoard {
                 return;
             }
 
+            //checks for hole or baddie
             try {
                 if (board(newR, newC)->isHole() || board(newR, newC)->isBaddie()){
                     throw runtime_error("Uh Oh! Hero has moved into a Baddie or the Abyss...");
@@ -74,6 +83,7 @@ class GameBoard {
                 return;
             }
 
+            //checks for barrier
             try {
                 if (board(newR, newC)->isBarrier()){
                     throw runtime_error("Hero trying to move into a barrier");
@@ -93,8 +103,12 @@ class GameBoard {
             
         }
 
+        /*Function detects collisions and out of bounds movements for a baddie
+        Try-catch blocks are used to alter movements to avoid collisions into barriers or out of bounds, OR
+        to detect when the baddie comes into contact with baddies or holes*/
         void baddieCollisionChecking(BoardCell* &baddie, size_t& newR, size_t& newC, bool& heroRemoved, bool& baddieRemoved){
 
+            //first out of bounds are checked
             try {
                 if (newR < 0 || newR >= numRows) { 
                     throw runtime_error("Baddie trying to move out-of-bounds with an invalid row");
@@ -117,6 +131,7 @@ class GameBoard {
                 cout << "Changing column for Baddie position to stay in-bounds\n";
             }
 
+            //checks if the Hero is caught
             try {
                 if (board(newR, newC)->isHero()){
                     throw runtime_error("Uh Oh! A Baddie has caught the Hero...");
@@ -130,6 +145,7 @@ class GameBoard {
                 return;
             }
 
+            //checks for hole
             try {
                 if (board(newR, newC)->isHole()){
                     throw runtime_error("Yipee! A Baddie has moved into the Abyss...");
@@ -143,6 +159,7 @@ class GameBoard {
                 return;
             }
 
+            //checks if colliding with another baddie
             try {
                 if (board(newR, newC)->isBaddie()){
                     throw runtime_error("Baddie is trying to move onto another Baddie");
@@ -157,6 +174,7 @@ class GameBoard {
                 return;
             }
 
+            //checks for barrier
             try {
                 if (board(newR, newC)->isBarrier()){
                     throw runtime_error("Baddie trying to move into a barrier");
@@ -173,6 +191,7 @@ class GameBoard {
                 cout << "Changing Baddie position to stay off barrier\n";
             }
 
+            //checks for exit
             try {
                 if (board(newR, newC)->isExit()){
                     throw runtime_error("Baddie trying to move onto exit");
@@ -182,7 +201,7 @@ class GameBoard {
                 cout << excpt.what() << endl;
 
                 newC = baddie->getCol();
-                if (board(newR, newC)->isBarrier()){
+                if (board(newR, newC)->isBarrier() || board(newR, newC)->isExit()){
                     newR = baddie->getRow();
                 }
 
@@ -405,42 +424,21 @@ class GameBoard {
         }
 
         
-        //---------------------------------------------------------------------------------
-        // void getHeroPosition(size_t& row, size_t& col)
-        //
-        // getter for Hero's position, which are private data members
-        //      int HeroRow;
-	    //      int HeroCol;
-        // note: row and col are passed-by-reference
-        //---------------------------------------------------------------------------------
+        /*Function finds the position of the Hero by assigning the passed by reference
+        parameters row and col with the private data members HeroRow and HeroCol*/
         void getHeroPosition(size_t& row, size_t& col) {
             row = HeroRow;
             col = HeroCol;
         }
 
-        //---------------------------------------------------------------------------------
-        // void setHeroPosition(size_t row, size_t col)
-        //
-        // setter for Hero's position, which are private data members
-        //      int HeroRow;
-	    //      int HeroCol;
-        //---------------------------------------------------------------------------------
+        /*Function sets the Hero's position by assigning the private data members 
+        HeroRow and HeroCol with parameters row and col*/
         void setHeroPosition(size_t row, size_t col) {
             HeroRow = row;
             HeroCol = col;
         }
 
-        
-        //---------------------------------------------------------------------------------
-        // findHero()
-        //
-        // updater for Hero's position, which are private data members
-        //      int HeroRow;
-	    //      int HeroCol;
-        // this function should find Hero in board and update
-        //      HeroRow and HeroCol with the Hero's updated position;
-        // if Hero cannot be found in board, then set Hero's position to (-1,-1)
-        //---------------------------------------------------------------------------------
+        /*Function searches the board to find the Hero and sets the position accordingly*/
         void findHero() {
             
             for (size_t r = 0; r < numRows; r++){
@@ -448,120 +446,73 @@ class GameBoard {
                 for (size_t c = 0; c < numCols; c++){
 
                     if (board(r,c)->isHero()){
-                        HeroRow = r;
-                        HeroCol = c;
+                        setHeroPosition(r, c);
                         return;
                     }
                 }
             }
 
-            HeroRow = -1;
-            HeroCol = -1;
-        
+            setHeroPosition(-1, -1); //if the Hero is not found, set the position to (-1, -1)
+    
         }
 
-        
-        //---------------------------------------------------------------------------------
-        // bool makeMoves(char HeroNextMove)
-        // 
-        // This is the primary gameplay operation for a single round of the game. 
-        // A LOT happens in this function... 
-        // General steps:
-        //  - Allow user to input their next move 
-        //  - Get the attempted move position for the Hero
-        //  - Move the hero, catching/resolving any potential collision exceptions...
-        //      - attempted move out-of-bounds: change row &/or col to stay on board
-        //      - attempted move into a barrier: change row &/or col to stay off barrier
-        //      - attempted move to the exit: remove hero from board, hero escaped!
-        //      - attempted move into a hole: remove hero from board, hero did not escape
-        //      - attempted move to a baddie: remove hero from board, hero did not escape
-        //      - attempted move to an empty space: actual move is the attempted move
-        //  - For each baddie (regular Monster, super Monster, or Bat) on the board...
-        //      - check that this baddies hasn't already moved this round
-        //      - get its attempted move position
-        //      - move the baddie, catching/resolving any potential collision exceptions...
-        //          - attempted move out-of-bounds: change row &/or col to stay on board
-        //          - attempted move into a barrier: change row &/or col to stay off barrier
-        //          - attempted move to the exit: change row &/or col to stay off exit
-        //          - attempted move into a hole: remove baddie from board
-        //          - attempted move to hero: remove hero from board, hero did not escape
-        //          - attempted move to a baddie: ignore attempted move, no position change
-        //          - attempted move to an empty space: actual move is the attempted move 
-        // 
-        // Note: all baddies (and the hero) fall into holes if their attempted 
-        //       move ENDs on a hole (i.e. even Bats are drawn into the 
-        //       Abyss if their attempted move takes them to an Abyss cell); 
-        //       BUT, baddies can travel over holes, as long as their attempted 
-        //       move does NOT END on a hole; this only applies, in practice, 
-        //       to super monsters and bats, since their step sizes can be more 
-        //       than 1 (monsters and the hero are limited to steps of size 1)
-        //
-        // Note: also, whereas baddies (and the hero) can never move onto a 
-        //       barrier (i.e. a wall), they can step over barriers as long
-        //       as the attempted move does NOT END on a barrier; this only 
-        //       applies, in practice, to super monsters and bats, since their 
-        //       step sizes can be more than 1 (monsters and the hero are limited 
-        //       to steps of size 1)
-        //
-        // Note: to prevent a single baddie from making multiple moves
-        //       during a single round of the game, whenever a baddie 
-        //       has moved, it should be marked as "already moved" in 
-        //       some way; this can be done using the [moved] data member
-        //       of the BoardCell base class, which has setter/getter 
-        //       functions provided. The [moved] data members must be 
-        //       reset for all BoardCells at the beginning of each round.
-        //
-        // Note: the [myRow] and [myCol] data members for BoardCell derived
-        //       class objects must be updated whenever a move is made; 
-        //       additionally, [HeroRow] and [HeroCol] data members for the 
-        //       GameBoard must be updated whenever the Hero has moved, 
-        //       which can be done easily with a call to findHero()
-        //
-        // Note: many actual moves made by non-static board cell objects 
-        //       (i.e. Heros, Monsters, Bats) involve constructing and/or 
-        //       destructing objects; be careful with memory management; 
-        //       specifically, make sure to free (delete) the memory for 
-        //       BoardCell derived class objects when you are done with it
-        //
-        // return true if Hero is still on board at the end of the round
-        // return false if Hero is NOT on board at the end of the round
-        //---------------------------------------------------------------------------------
+        /*Function makes moves for the Hero and all the baddies on the board for one single round of the game.
+        Parameter HeroNextMove represents the direction the Hero will attempt to move in
+        Returns true if Hero is still on board at the end of the round, returns false otherwise*/
         bool makeMoves(char HeroNextMove) {
 
+            //initializes all cell's moved data member to false before any movements happen
+            for (size_t r = 0; r < numRows; r++){
+
+                for (size_t c = 0; c < numCols; c++){
+                    board(r,c)->setMoved(false);
+                }
+
+            }
+
             size_t newR, newC;
+
+            //suggest a new location the Hero should move to
             board(HeroRow,HeroCol)->setNextMove(HeroNextMove);
             board(HeroRow,HeroCol)->attemptMoveTo(newR,newC,HeroRow,HeroCol);
 
             bool heroRemoved = false;
-            heroCollisionChecking(newR, newC, heroRemoved);
+            heroCollisionChecking(newR, newC, heroRemoved); //checks for collisions or out of bounds, altering the destination accordingly
             
+            //remove the Hero from its current cell
             freeCell(HeroRow, HeroCol);
             Nothing* nothingCell = new Nothing(HeroRow, HeroCol);
             setCell(nothingCell, HeroRow, HeroCol);
-            HeroRow = newR, HeroCol = newC;
+            setHeroPosition(newR, newC);
+
+            //end the round immediately if the Hero will be removed from the board
             if (heroRemoved){
                 return false;
             }
 
+            //move the Hero to its new cell
             freeCell(newR, newC);
             Hero* heroCell = new Hero(newR, newC);
             heroCell->setMoved(true);
             setCell(heroCell, newR, newC);
 
+            //iterate through the board, moving all baddies in respect to the Hero's position
             for (size_t r = 0; r < numRows; r++){
-
                 for (size_t c = 0; c < numCols; c++){
 
                     bool baddieRemoved = false;
-                    if (board(r,c)->isBaddie() && !board(r,c)->getMoved()){
+            
+                    if (board(r,c)->isBaddie() && !board(r,c)->getMoved()){ //check if it is a baddie that hasn't been moved
+
+                        //suggest a destintion for the baddie to move to
                         size_t newBadR, newBadC;
                         board(r,c)->attemptMoveTo(newBadR, newBadC, HeroRow, HeroCol);
 
-                        if (newBadR == r && newBadC == c){
+                        if (newBadR == r && newBadC == c){ //for not moving
                             continue;
                         }
                         
-                        baddieCollisionChecking(board(r,c), newBadR, newBadC, heroRemoved, baddieRemoved);
+                        baddieCollisionChecking(board(r,c), newBadR, newBadC, heroRemoved, baddieRemoved); //adjusts for collisions or out of bounds
 
                         if (newBadR == r && newBadC == c){
                             continue;
@@ -569,12 +520,14 @@ class GameBoard {
 
                         Nothing* nothingCell = new Nothing(r, c);
 
+                        //when the baddie will be removed
                         if (baddieRemoved){
                             freeCell(r, c);
                             setCell(nothingCell, r, c);
                             continue;
                         }
 
+                        //move the baddie
                         freeCell(newBadR, newBadC);
                         setCell(board(r, c), newBadR, newBadC);
                         board(r,c)->setRow(newBadR);
@@ -585,14 +538,6 @@ class GameBoard {
                         
                     }
                 }
-            }
-
-            for (size_t r = 0; r < numRows; r++){
-
-                for (size_t c = 0; c < numCols; c++){
-                    board(r,c)->setMoved(false);
-                }
-
             }
 
             return !heroRemoved;

@@ -1,3 +1,7 @@
+/*Main file for the game.
+Reads in input for game settings and a move for the Hero each round.
+Code fully provided by CS211 professors, no alterations added*/
+
 #include <cstdlib>
 #include <iostream>
 #include <string>

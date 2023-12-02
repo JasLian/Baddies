@@ -1,3 +1,6 @@
+/*File contains the Boardcell class and all its derived classes.
+attemptMoveTo() function written by Jason Liang*/
+
 #ifndef _BOARDCELL_H
 #define _BOARDCELL_H
 
@@ -13,23 +16,10 @@ class BoardCell {
         
         virtual char display( ) = 0; // pure virtual function; this is an abstract base class
 
+        //Default attemptMoveTo() functions for the BoardCell class, overridden in derived classes
     	virtual void attemptMoveTo(size_t& newR, size_t& newC, size_t hRow, size_t hCol) {
-            
-            //------------------------------------------------------------
-            // TODO: write the base class funtion for a board cell's 
-            //       attempted move to position (newR,newC). 
-            //
-            //       The default action is to stay put, i.e. new position 
-            //       (newR, newC) is same as old position (myRow, myCol).
-            //
-            //       Note: the Hero's current position (hRow,hCol) is
-            //       needed for this polymorphic function in some derived
-            //       classes, specifically for Baddie movement
-            //------------------------------------------------------------
-            
             newR = myRow;
             newC = myCol;
-            
         }
         
         virtual bool isHero( ) {return false;}
@@ -81,53 +71,61 @@ class Hero: public BoardCell {
             nextMove = inChar;
         }
     	
+        /*Function proposes a move for the Hero to make by assigning the 
+        passed by reference parameters newR and newC based on the nextMove data member*/
         virtual void attemptMoveTo(size_t& newR, size_t& newC, size_t hRow, size_t hCol) {
-            //------------------------------------------------------------------------
-            // TODO: write attemptMoveTo() for Hero 
-            //      
-            //      Hero's attempted move is determined by the nextMove data member 
-            //      analyze nextMove to determine attempted new position for Hero
-            //          'q' = up and left       'w' = up        'e' = up and right
-            //          'a' = left              's' = stay      'd' = right
-            //          'z' = down and left     'x' = down      'c' = down and right
-            //       interpret ANY other input as 's' = stay
-            //------------------------------------------------------------------------
             
             switch(nextMove){
 
+                //up and left
                 case 'q':
                     newR = hRow - 1;
                     newC = hCol - 1;
                     break;
+                
+                //up
                 case 'w':
                     newR = hRow - 1;
                     newC = hCol;
                     break;
+
+                //up and right
                 case 'e':
                     newR = hRow - 1;
                     newC = hCol + 1;
                     break;
+
+                //left
                 case 'a':
                     newR = hRow;
                     newC = hCol - 1;
                     break;
+
+                //right
                 case 'd':
                     newR = hRow;
                     newC = hCol + 1;
                     break;
+
+                //down and right
                 case 'z':
                     newR = hRow + 1;
                     newC = hCol - 1;
                     break;
+
+                //down
                 case 'x':
                     newR = hRow + 1;
                     newC = hCol;
                     break;
+
+                //down and right
                 case 'c':
                     newR = hRow + 1;
                     newC = hCol + 1;
                     break;
 
+                //stay in place
                 case 's':
                 default:
                     newR = hRow;
@@ -171,31 +169,11 @@ class Monster: public BoardCell {
             return power;
         }
         
+        /*Function proposes a move for the Monster to make by assigning the 
+        passed by reference parameters newR and newC based on the Hero's position*/
     	virtual void attemptMoveTo(size_t& newR, size_t& newC, size_t hRow, size_t hCol) {
             
-            //------------------------------------------------------------------------
-            // TODO: write attemptMoveTo() for Monster 
-            //      
-            //       Monsters always attempt to navigate toward the hero;
-            //          the hero's position is passed in as (hRow,hCol);
-            //              - regular monsters attempt to move...
-            //                  1 step vertically closer to hero
-            //                  (unless already in same column)
-            //                              AND 
-            //                  1 step horizontally closer to hero
-            //                  (unless already in same row)
-            //              - super monsters attempt to move...
-            //                  2 steps vertically closer to hero
-            //                  (unless already in same column)
-            //                              AND 
-            //                  2 steps horizontally closer to hero
-            //                  (unless already in same row)
-            //          note: super monsters are BIG and CANNOT make 1-step moves in
-            //                either direction; i.e. if they move vertically or 
-            //                horizontally, it must be a 2-step move in either/both 
-            //                direction(s)
-            //------------------------------------------------------------------------
-            
+            //always attempt to move to the same row and coloumn as the Hero
             if (this->getRow() == hRow){
                 newR = this->getRow();
             }
@@ -240,14 +218,11 @@ class Bat: public BoardCell {
         virtual bool isStatic( ) {return false;}
         virtual char display( ) {return '~';}
         
+        /*Function proposes a move for the Bat to make by assigning the 
+        passed by reference parameters newR and newC based on the Hero's position*/
     	virtual void attemptMoveTo(size_t& newR, size_t& newC, size_t hRow, size_t hCol) {
-            //------------------------------------------------------------------------
-            // TODO: write attemptMoveTo() for Bat 
-            //      
-            //       Bats always attempt to navigate to the hero's column, 
-            //       but cannot change rows;
-            //------------------------------------------------------------------------
             
+            //Bat will always attempt to navigate to the Hero's column, but cannot change rows;
             newR = this->getRow();
             newC = hCol;
 
