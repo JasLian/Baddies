@@ -11,8 +11,3 @@ valgrind:
 run_solution:
 	chmod a+x solution.exe
 	./solution.exe
-
-test:
-	rm -f test.exe;
-	g++ -g test.cpp -o test.exe
-	./test.exe
