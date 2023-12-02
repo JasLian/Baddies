@@ -202,10 +202,10 @@ class Monster: public BoardCell {
             else{
                 
                 if (this->getRow() < hRow){
-                    newR = this->getRow() - power;
+                    newR = this->getRow() + power;
                 }
                 else{
-                    newR = this->getRow() + power; 
+                    newR = this->getRow() - power; 
                 }
             }
 
