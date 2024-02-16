@@ -1,5 +1,5 @@
 /*File contains the GameBoard class that represents the game board.
-getHeroPosition(), setHeroPosition(), findHero(), and makeMoves() function written by Jason Liang*/
+starter code provided by UIC CS211 professors are labeled*/
 
 #ifndef _GAMEBOARD_H
 #define _GAMEBOARD_H
@@ -211,6 +211,8 @@ class GameBoard {
         }
 
 	public: 
+
+	//BEGIN OF STARTER CODE
 		/* default constructor */
         GameBoard() {
             numMonsters = 4;
@@ -422,7 +424,7 @@ class GameBoard {
         size_t getNumCols() {
             return numCols;
         }
-
+	//END OF STARTER CODE
         
         /*Function finds the position of the Hero by assigning the passed by reference
         parameters row and col with the private data members HeroRow and HeroCol*/
