@@ -31,7 +31,7 @@ class GameBoard {
         /*Function detects collisions and out of bounds movements for the Hero
         Try-catch blocks are used to alter movements to avoid collisions into barriers or out of bounds, OR
         to detect when the Hero comes into contact with baddies or holes*/
-		void heroCollisionChecking(size_t& newR, size_t& newC, bool& heroRemoved){
+	void heroCollisionChecking(size_t& newR, size_t& newC, bool& heroRemoved){
 
             //first out of bounds are checked
             try {
