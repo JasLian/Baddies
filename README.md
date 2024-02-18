@@ -10,9 +10,43 @@ First, the user selects the settings for the game such as dungeon size and numbe
 
 Once set up, the user is presented with the game board. Now they can take control of the Hero using the directional inputs
 
-Q | W | E     NW |   N   | NE 
-A | S | D      W |  Stay | E
-Z | X | C     SW |   S   | SE
+<table>
+  <caption>Inputs</caption>
+  <tr>
+    <td>Q</td>
+    <td>W</td>
+    <td>E</td>
+  </tr>
+  <tr>
+    <td>A</td>
+    <td>S</td>
+    <td>D</td>
+  </tr>
+  <tr>
+    <td>Z</td>
+    <td>X</td>
+    <td>C</td>
+  </tr>
+</table>
+
+<table>
+  <caption>Move</caption>
+  <tr>
+    <td>NW</td>
+    <td>North</td>
+    <td>NE</td>
+  </tr>
+  <tr>
+    <td>West</td>
+    <td>Stay</td>
+    <td>East</td>
+  </tr>
+  <tr>
+    <td>SW</td>
+    <td>South</td>
+    <td>SE</td>
+  </tr>
+</table>
 
 and try to reach the exit.
 
